@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carga de alumnos</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 1000px; margin: 20px auto; padding: 0 12px; }
+  form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  label { display: flex; flex-direction: column; font-size: 0.9em; }
+  input { padding: 6px; margin-top: 3px; }
+  .botones { grid-column: 1 / -1; }
+  button { padding: 8px 14px; cursor: pointer; }
+  .tabla-contenedor { overflow-x: auto; }   /* la tabla se desplaza si no entra en pantalla */
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #999; padding: 6px 8px; text-align: left; }
+  th { background: #333; color: #fff; }
+  tr:nth-child(even) td { background: #f2f2f2; }
+</style>
+</head>
+<body>
+<h1>Carga de alumnos</h1>
+
+<!-- Formulario: cada campo tiene un id para leer su valor desde JavaScript -->
+<form id="formulario">
+  <label>Apellido   <input type="text"  id="apellido"  required></label>
+  <label>Nombre     <input type="text"  id="nombre"    required></label>
+  <label>Domicilio  <input type="text"  id="domicilio" required></label>
+  <label>Localidad  <input type="text"  id="localidad" required></label>
+  <label>Carrera    <input type="text"  id="carrera"   required></label>
+  <label>Teléfono   <input type="tel"   id="telefono"  required></label>
+  <label>Email      <input type="email" id="email"     required></label>
+  <div class="botones">
+    <button type="submit">Agregar alumno</button>
+  </div>
+</form>
+
+<h2>Alumnos cargados (<span id="contador">0</span>)</h2>
+<div class="tabla-contenedor">
+  <table>
+    <thead>
+      <tr>
+        <th>Apellido</th><th>Nombre</th><th>Domicilio</th><th>Localidad</th>
+        <th>Carrera</th><th>Teléfono</th><th>Email</th><th>Acción</th>
+      </tr>
+    </thead>
+    <!-- Las filas se agregan dinámicamente aquí -->
+    <tbody id="cuerpoTabla"></tbody>
+  </table>
+</div>
+
+<script>
+/* ============================================================
+   DATOS
+   ============================================================ */
+
+// Array donde se guardan los alumnos. Cada alumno es un objeto
+// con las propiedades: apellido, nombre, domicilio, localidad,
+// carrera, telefono, email.
+const alumnos = [];
+
+/* ============================================================
+   FUNCIONES
+   ============================================================ */
+
+/**
+ * Vuelve a dibujar la tabla completa a partir del array "alumnos".
+ * Se llama cada vez que se agrega o elimina un alumno, así la
+ * tabla siempre refleja el estado actual de los datos.
+ */
+function dibujarTabla() {
+  const cuerpo = document.getElementById("cuerpoTabla");
+  cuerpo.innerHTML = "";   // se vacía la tabla antes de redibujar
+
+  alumnos.forEach((alumno, indice) => {
+    const fila = document.createElement("tr");
+
+    // Se crea una celda <td> por cada dato del alumno.
+    // Se usa textContent (no innerHTML) para evitar que se inserte código HTML escrito por el usuario.
+    const campos = ["apellido", "nombre", "domicilio", "localidad", "carrera", "telefono", "email"];
+    campos.forEach(campo => {
+      const celda = document.createElement("td");
+      celda.textContent = alumno[campo];
+      fila.appendChild(celda);
+    });
+
+    // Última celda: botón para eliminar este alumno
+    const celdaAccion = document.createElement("td");
+    const botonEliminar = document.createElement("button");
+    botonEliminar.textContent = "Eliminar";
+    botonEliminar.onclick = () => eliminarAlumno(indice);
+    celdaAccion.appendChild(botonEliminar);
+    fila.appendChild(celdaAccion);
+
+    cuerpo.appendChild(fila);
+  });
+
+  // Se actualiza el contador de alumnos
+  document.getElementById("contador").textContent = alumnos.length;
+}
+
+/**
+ * Elimina un alumno del array según su posición y redibuja la tabla.
+ * @param {number} indice - posición del alumno en el array
+ */
+function eliminarAlumno(indice) {
+  alumnos.splice(indice, 1);   // splice(posición, cantidad a borrar)
+  dibujarTabla();
+}
+
+/**
+ * Lee los datos del formulario, crea el alumno, lo guarda en el array
+ * y actualiza la tabla. Se ejecuta al enviar el formulario.
+ * @param {Event} evento - evento "submit" del formulario
+ */
+function agregarAlumno(evento) {
+  evento.preventDefault();   // evita que la página se recargue al enviar
+
+  // Se crea el objeto con los valores de cada campo (trim quita espacios sobrantes)
+  const alumno = {
+    apellido:  document.getElementById("apellido").value.trim(),
+    nombre:    document.getElementById("nombre").value.trim(),
+    domicilio: document.getElementById("domicilio").value.trim(),
+    localidad: document.getElementById("localidad").value.trim(),
+    carrera:   document.getElementById("carrera").value.trim(),
+    telefono:  document.getElementById("telefono").value.trim(),
+    email:     document.getElementById("email").value.trim()
+  };
+
+  alumnos.push(alumno);   // se agrega al final del array
+  dibujarTabla();         // se actualiza la tabla en pantalla
+
+  // Se limpia el formulario y se devuelve el foco al primer campo
+  document.getElementById("formulario").reset();
+  document.getElementById("apellido").focus();
+}
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+
+// Al enviar el formulario (botón o tecla Enter) se agrega el alumno.
+// Los atributos "required" y type="email" validan los campos automáticamente.
+document.getElementById("formulario").addEventListener("submit", agregarAlumno);
+</script>
+</body>
+</html>

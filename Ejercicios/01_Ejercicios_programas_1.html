@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejercicios de JavaScript</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 0 12px; }
+  section { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+  h2 { margin-top: 0; font-size: 1.1em; }
+  .salida { background: #f4f4f4; padding: 8px; margin-top: 8px; min-height: 20px; white-space: pre-wrap; word-wrap: break-word; }
+  .rojo { color: red; }
+  .verde { color: green; }
+  input, textarea { margin: 2px; }
+  textarea { width: 100%; height: 80px; }
+</style>
+</head>
+<body>
+<h1>Ejercicios de JavaScript</h1>
+
+<!-- ===== Ejercicios 1 a 9: se ejecutan con botones ===== -->
+<section><h2>1. Números del 1 al 100</h2>
+  <button onclick="ej1()">Ejecutar</button><div class="salida" id="s1"></div></section>
+
+<section><h2>2. Tres números en orden ascendente (usa prompt)</h2>
+  <button onclick="ej2()">Ejecutar</button><div class="salida" id="s2"></div></section>
+
+<section><h2>3. Pares del 2 al 100</h2>
+  <button onclick="ej3()">Ejecutar</button><div class="salida" id="s3"></div></section>
+
+<section><h2>4. Impares del 1 al 99</h2>
+  <button onclick="ej4()">Ejecutar</button><div class="salida" id="s4"></div></section>
+
+<section><h2>5. Del 1 al 100: pares en rojo, impares en verde</h2>
+  <button onclick="ej5()">Ejecutar</button><div class="salida" id="s5"></div></section>
+
+<section><h2>6. Tablas de multiplicar del 1 al 10</h2>
+  <button onclick="ej6()">Ejecutar</button><div class="salida" id="s6"></div></section>
+
+<section><h2>7. Rectángulo de asteriscos (usa prompt)</h2>
+  <button onclick="ej7()">Ejecutar</button><div class="salida" id="s7"></div></section>
+
+<section><h2>8. Array de 50 aleatorios: suma, promedio, mayor, menor</h2>
+  <button onclick="ej8()">Ejecutar</button><div class="salida" id="s8"></div></section>
+
+<section><h2>9. FizzBuzz del 1 al 100</h2>
+  <button onclick="ej9()">Ejecutar</button><div class="salida" id="s9"></div></section>
+
+<!-- ===== Ejercicios 10 a 16: con formularios ===== -->
+<section><h2>10. Números entre dos valores</h2>
+  <input type="number" id="e10a" placeholder="Desde">
+  <input type="number" id="e10b" placeholder="Hasta">
+  <button onclick="ej10()">Mostrar</button><div class="salida" id="s10"></div></section>
+
+<section><h2>11. Buscar un número en un array de 100 aleatorios</h2>
+  <input type="number" id="e11" placeholder="Número a buscar">
+  <button onclick="ej11()">Buscar</button><div class="salida" id="s11"></div></section>
+
+<section><h2>12. Nombre del mes</h2>
+  <input type="number" id="e12" placeholder="Mes (1-12)">
+  <button onclick="ej12()">Mostrar</button><div class="salida" id="s12"></div></section>
+
+<section><h2>13. Verificar número en array de 50 (ciclo e includes)</h2>
+  <input type="number" id="e13" placeholder="Número a buscar">
+  <button onclick="ej13()">Verificar</button><div class="salida" id="s13"></div></section>
+
+<section><h2>14. Análisis de texto</h2>
+  <textarea id="e14" placeholder="Escribe un texto..."></textarea><br>
+  <button onclick="ej14a()">Cantidad de caracteres</button>
+  <button onclick="ej14b()">Cantidad de palabras</button>
+  <button onclick="ej14c()">Palabras sin repetir</button>
+  <div class="salida" id="s14"></div></section>
+
+<section><h2>15. Análisis de texto en tiempo real</h2>
+  <textarea id="e15" placeholder="Escribe y mira los resultados..." oninput="ej15()"></textarea>
+  <div class="salida" id="s15"></div></section>
+
+<section><h2>16. Decimal a binario</h2>
+  <input type="number" id="e16" placeholder="Número decimal">
+  <button onclick="ej16()">Convertir</button><div class="salida" id="s16"></div></section>
+
+<script>
+/* ============================================================
+   FUNCIONES AUXILIARES
+   ============================================================ */
+
+/**
+ * Escribe texto plano en el div de salida indicado.
+ * @param {string} id    - id del elemento donde se muestra el resultado
+ * @param {string} texto - texto a mostrar
+ */
+function mostrar(id, texto) {
+  document.getElementById(id).textContent = texto;
+}
+
+/**
+ * Genera un array de números enteros positivos aleatorios.
+ * @param {number} cantidad - cuántos números generar
+ * @param {number} max      - valor máximo (por defecto 100)
+ * @returns {number[]}
+ */
+function generarAleatorios(cantidad, max = 100) {
+  const arr = [];
+  for (let i = 0; i < cantidad; i++) {
+    // Math.random() da un decimal entre 0 y 1; lo escalamos y redondeamos hacia abajo
+    arr.push(Math.floor(Math.random() * max) + 1);
+  }
+  return arr;
+}
+
+/* ============================================================
+   EJERCICIO 1: mostrar los números del 1 al 100
+   ============================================================ */
+function ej1() {
+  let texto = "";
+  for (let i = 1; i <= 100; i++) {   // ciclo for de 1 a 100
+    texto += i + " ";
+  }
+  mostrar("s1", texto);
+}
+
+/* ============================================================
+   EJERCICIO 2: ingresar 3 números con prompt y ordenarlos
+   ============================================================ */
+function ej2() {
+  // prompt devuelve texto, por eso se convierte con Number()
+  const a = Number(prompt("Ingresa el primer número:"));
+  const b = Number(prompt("Ingresa el segundo número:"));
+  const c = Number(prompt("Ingresa el tercer número:"));
+
+  // sort con función comparadora (a - b = orden ascendente numérico)
+  const ordenados = [a, b, c].sort((x, y) => x - y);
+  mostrar("s2", "Orden ascendente: " + ordenados.join(", "));
+}
+
+/* ============================================================
+   EJERCICIO 3: pares del 2 al 100
+   ============================================================ */
+function ej3() {
+  let texto = "";
+  for (let i = 2; i <= 100; i += 2) {  // se avanza de 2 en 2
+    texto += i + " ";
+  }
+  mostrar("s3", texto);
+}
+
+/* ============================================================
+   EJERCICIO 4: impares del 1 al 99
+   ============================================================ */
+function ej4() {
+  let texto = "";
+  for (let i = 1; i <= 99; i += 2) {   // se empieza en 1 y se avanza de 2 en 2
+    texto += i + " ";
+  }
+  mostrar("s4", texto);
+}
+
+/* ============================================================
+   EJERCICIO 5: del 1 al 100, pares en rojo e impares en verde
+   ============================================================ */
+function ej5() {
+  let html = "";
+  for (let i = 1; i <= 100; i++) {
+    // i % 2 === 0 significa que el número es par
+    const clase = (i % 2 === 0) ? "rojo" : "verde";
+    html += `<span class="${clase}">${i}</span> `;
+  }
+  // Aquí se usa innerHTML porque necesitamos las etiquetas <span>
+  document.getElementById("s5").innerHTML = html;
+}
+
+/* ============================================================
+   EJERCICIO 6: tablas de multiplicar del 1 al 10
+   ============================================================ */
+function ej6() {
+  let texto = "";
+  for (let tabla = 1; tabla <= 10; tabla++) {        // ciclo externo: la tabla
+    texto += `--- Tabla del ${tabla} ---\n`;
+    for (let n = 1; n <= 10; n++) {                  // ciclo interno: el multiplicador
+      texto += `${tabla} x ${n} = ${tabla * n}\n`;
+    }
+    texto += "\n";
+  }
+  mostrar("s6", texto);
+}
+
+/* ============================================================
+   EJERCICIO 7: rectángulo de asteriscos
+   ============================================================ */
+function ej7() {
+  const ancho = Number(prompt("Ancho del rectángulo:"));
+  const alto  = Number(prompt("Alto del rectángulo:"));
+  let texto = "";
+  for (let fila = 0; fila < alto; fila++) {      // una vuelta por cada fila
+    for (let col = 0; col < ancho; col++) {      // una vuelta por cada columna
+      texto += "*";
+    }
+    texto += "\n";                               // salto de línea al terminar la fila
+  }
+  document.getElementById("s7").innerHTML = "<pre>" + texto + "</pre>";
+}
+
+/* ============================================================
+   EJERCICIO 8: array de 50 aleatorios y estadísticas
+   ============================================================ */
+function ej8() {
+  const numeros = generarAleatorios(50);
+
+  // Suma con ciclo, mayor y menor en la misma pasada
+  let suma = 0;
+  let mayor = numeros[0];
+  let menor = numeros[0];
+  for (let i = 0; i < numeros.length; i++) {
+    suma += numeros[i];
+    if (numeros[i] > mayor) mayor = numeros[i];
+    if (numeros[i] < menor) menor = numeros[i];
+  }
+  const promedio = suma / numeros.length;
+
+  // Cantidad de valores por encima del promedio
+  let sobrePromedio = 0;
+  for (let i = 0; i < numeros.length; i++) {
+    if (numeros[i] > promedio) sobrePromedio++;
+  }
+
+  mostrar("s8",
+    "Valores: " + numeros.join(", ") + "\n" +
+    "Suma: " + suma + "\n" +
+    "Promedio: " + promedio.toFixed(2) + "\n" +
+    "Mayor: " + mayor + "\n" +
+    "Menor: " + menor + "\n" +
+    "Por encima del promedio: " + sobrePromedio);
+}
+
+/* ============================================================
+   EJERCICIO 9: FizzBuzz
+   ============================================================ */
+function ej9() {
+  let texto = "";
+  for (let i = 1; i <= 100; i++) {
+    // IMPORTANTE: primero se pregunta por 3 y 5 juntos, si no, nunca se cumpliría
+    if (i % 3 === 0 && i % 5 === 0) texto += "Fizz Buzz\n";
+    else if (i % 3 === 0)           texto += "Fizz\n";
+    else if (i % 5 === 0)           texto += "Buzz\n";
+    else                            texto += i + "\n";
+  }
+  mostrar("s9", texto);
+}
+
+/* ============================================================
+   EJERCICIO 10: mostrar los valores entre dos números
+   ============================================================ */
+function ej10() {
+  const a = Number(document.getElementById("e10a").value);
+  const b = Number(document.getElementById("e10b").value);
+
+  // Si el usuario los ingresa al revés, se determina cuál es el menor
+  const desde = Math.min(a, b);
+  const hasta = Math.max(a, b);
+
+  const valores = [];
+  // "Entre" significa sin incluir los extremos
+  for (let i = desde + 1; i < hasta; i++) valores.push(i);
+
+  mostrar("s10", valores.length
+    ? "Valores entre " + desde + " y " + hasta + ": " + valores.join(", ")
+    : "No hay valores entre esos números.");
+}
+
+/* ============================================================
+   EJERCICIO 11: buscar un número en un array de 100 aleatorios
+   ============================================================ */
+// El array se crea una sola vez al cargar la página
+const arr11 = generarAleatorios(100);
+
+function ej11() {
+  const buscado = Number(document.getElementById("e11").value);
+  const encontrado = arr11.includes(buscado);
+  mostrar("s11",
+    (encontrado ? "El número " + buscado + " SÍ se encuentra" : "El número " + buscado + " NO se encuentra") +
+    " en el array.\n\nArray: " + arr11.join(", "));
+}
+
+/* ============================================================
+   EJERCICIO 12: nombre del mes según su número
+   ============================================================ */
+function ej12() {
+  const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                 "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const n = Number(document.getElementById("e12").value);
+
+  // Validamos que sea entero entre 1 y 12; el índice del array es n - 1
+  if (Number.isInteger(n) && n >= 1 && n <= 12) mostrar("s12", meses[n - 1]);
+  else mostrar("s12", "Ingresa un número entero entre 1 y 12.");
+}
+
+/* ============================================================
+   EJERCICIO 13: verificar si un número está en un array de 50
+   (con ciclo y con el método includes)
+   ============================================================ */
+const arr13 = generarAleatorios(50);
+
+function ej13() {
+  const buscado = Number(document.getElementById("e13").value);
+
+  // a) Con ciclo repetitivo
+  let conCiclo = false;
+  for (let i = 0; i < arr13.length; i++) {
+    if (arr13[i] === buscado) {
+      conCiclo = true;
+      break;               // si lo encontramos, no hace falta seguir
+    }
+  }
+
+  // b) Con el método nativo includes
+  const conIncludes = arr13.includes(buscado);
+
+  mostrar("s13",
+    "Con ciclo: " + (conCiclo ? "está" : "no está") + " en el array\n" +
+    "Con includes: " + (conIncludes ? "está" : "no está") + " en el array\n\n" +
+    "Array: " + arr13.join(", "));
+}
+
+/* ============================================================
+   EJERCICIO 14: análisis de texto (caracteres, palabras, únicas)
+   ============================================================ */
+
+/** Cuenta los caracteres, incluyendo espacios. */
+function contarCaracteres(texto) {
+  return texto.length;
+}
+
+/**
+ * Devuelve las palabras del texto.
+ * Se separa por espacios, comas, puntos y punto y coma.
+ * filter(Boolean) elimina los textos vacíos que genera el split.
+ */
+function obtenerPalabras(texto) {
+  return texto.split(/[\s,.;]+/).filter(Boolean);
+}
+
+/** Devuelve las palabras sin repetir (un Set no admite duplicados). */
+function palabrasUnicas(texto) {
+  return [...new Set(obtenerPalabras(texto))];
+}
+
+function ej14a() {
+  mostrar("s14", "Caracteres: " + contarCaracteres(document.getElementById("e14").value));
+}
+function ej14b() {
+  mostrar("s14", "Palabras: " + obtenerPalabras(document.getElementById("e14").value).length);
+}
+function ej14c() {
+  mostrar("s14", "Palabras sin repetir: [" + palabrasUnicas(document.getElementById("e14").value).join(", ") + "]");
+}
+
+/* ============================================================
+   EJERCICIO 15: lo mismo que el 14, pero mientras se escribe
+   (se ejecuta con el evento "oninput" del textarea)
+   ============================================================ */
+function ej15() {
+  const texto = document.getElementById("e15").value;
+  mostrar("s15",
+    "Caracteres: " + contarCaracteres(texto) + "\n" +
+    "Palabras: " + obtenerPalabras(texto).length + "\n" +
+    "Palabras sin repetir: [" + palabrasUnicas(texto).join(", ") + "]");
+}
+
+/* ============================================================
+   EJERCICIO 16: convertir un número decimal a binario
+   ============================================================ */
+
+/**
+ * Convierte un entero decimal a binario con divisiones sucesivas por 2.
+ * Los restos, leídos de abajo hacia arriba, forman el número binario.
+ * @param {number} decimal - entero mayor o igual a 0
+ * @returns {string} número en binario
+ */
+function decimalABinario(decimal) {
+  if (decimal === 0) return "0";
+  let binario = "";
+  while (decimal > 0) {
+    binario = (decimal % 2) + binario;   // el resto se agrega al INICIO
+    decimal = Math.floor(decimal / 2);   // división entera por 2
+  }
+  return binario;
+}
+
+function ej16() {
+  const n = Number(document.getElementById("e16").value);
+  if (!Number.isInteger(n) || n < 0) {
+    mostrar("s16", "Ingresa un número entero positivo.");
+    return;
+  }
+  mostrar("s16", n + " en binario es " + decimalABinario(n) +
+    "\n(Verificación con toString(2): " + n.toString(2) + ")");
+}
+</script>
+</body>
+</html>

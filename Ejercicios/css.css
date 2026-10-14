@@ -1,0 +1,42 @@
+* {
+      box-size: border-box;
+    }
+
+    forma {
+      ancho: 380px;
+      color de fondo: #add1eb;
+      relleno: 15px;
+      radio de borde: 12px;
+      margen: automático;
+      box-shadow: 0 0 5px 5px rgb(54, 53, 53)
+      ;
+    }
+
+    etiqueta {
+      mostrar: bloque;
+    }
+    input[type=text],botón{
+      ancho: 100%;
+    }
+    aporte,
+    botón {
+      relleno: 10px;
+      borde: ninguno;
+      radio de borde: 12px;
+      esquema: ninguno;
+      margen inferior: 18px;
+    }
+
+    botón {
+      color de fondo: #103bd8;
+      color: blanco;
+    }
+
+    h1 {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      alineación de texto: centro;
+    }
+
+    pag {
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    }

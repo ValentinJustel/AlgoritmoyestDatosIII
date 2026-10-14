@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administrador de lista enlazada</title>
+<style>
+  body { margin: 0; font-family: Roboto, Arial, sans-serif; background: #2f3637; color: #fff; }
+  .contenedor { display: flex; flex-wrap: wrap; min-height: 100vh; }
+  .panel { width: 200px; padding: 40px 14px; box-sizing: border-box; }
+  .panel h2 { text-align: center; margin: 0 0 4px; }
+  .panel label { font-size: 0.8em; display: block; }
+  .panel input { width: 100%; box-sizing: border-box; padding: 10px; border: none; margin-bottom: 14px; }
+  .panel button { width: 100%; padding: 8px; margin-bottom: 14px; background: #6c757d; color: #fff; border: none; border-radius: 3px; cursor: pointer; }
+  .panel button:hover { background: #868e96; }
+  .principal { flex: 1; min-width: 280px; text-align: center; padding: 10px; }
+  .principal h1 { margin: 0; }
+  .principal h3 { margin: 6px 0 10px; }
+  #mensaje { min-height: 24px; margin-bottom: 8px; color: #ffd966; }
+  #lista { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .nodo { width: 70px; height: 70px; border-radius: 50%; background: #3399ff; color: #111;
+          display: flex; align-items: center; justify-content: center; font-size: 1.6em;
+          overflow: hidden; word-break: break-all; }
+  .nodo.encontrado { background: #ffd966; outline: 4px solid #fff; }   /* nodo resaltado por la búsqueda */
+</style>
+</head>
+<body>
+<div class="contenedor">
+
+  <!-- Panel izquierdo: formulario -->
+  <div class="panel">
+    <h2>Ingresa un valor</h2>
+    <label for="valor">Valor</label>
+    <input type="text" id="valor">
+    <button onclick="agregar()">Agregar</button>
+    <button onclick="buscar()">Buscar</button>
+    <button onclick="eliminar()">Eliminar</button>
+  </div>
+
+  <!-- Panel derecho: listado de nodos -->
+  <div class="principal">
+    <h1>Administrador de lista enlazada</h1>
+    <h3>Listado de valores</h3>
+    <div id="mensaje"></div>
+    <div id="lista"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   ESTRUCTURA DE DATOS: LISTA ENLAZADA SIMPLE
+   ============================================================ */
+
+/**
+ * Un nodo guarda un valor y una referencia al nodo siguiente.
+ * Si "siguiente" es null, es el último nodo de la lista.
+ */
+class Nodo {
+  constructor(valor) {
+    this.valor = valor;
+    this.siguiente = null;
+  }
+}
+
+/**
+ * Lista enlazada: solo conoce el primer nodo (cabeza).
+ * Para llegar a los demás hay que recorrerla siguiendo "siguiente".
+ */
+class ListaEnlazada {
+  constructor() {
+    this.cabeza = null;   // lista vacía al comienzo
+  }
+
+  /** Agrega un nodo al final de la lista. */
+  agregar(valor) {
+    const nuevo = new Nodo(valor);
+
+    // Si la lista está vacía, el nuevo nodo es la cabeza
+    if (this.cabeza === null) {
+      this.cabeza = nuevo;
+      return;
+    }
+    // Si no, se recorre hasta el último nodo y se enlaza el nuevo
+    let actual = this.cabeza;
+    while (actual.siguiente !== null) {
+      actual = actual.siguiente;
+    }
+    actual.siguiente = nuevo;
+  }
+
+  /**
+   * Busca un valor recorriendo la lista.
+   * @returns {number} posición (empezando en 0) o -1 si no existe
+   */
+  buscar(valor) {
+    let actual = this.cabeza;
+    let posicion = 0;
+    while (actual !== null) {
+      if (actual.valor === valor) return posicion;
+      actual = actual.siguiente;
+      posicion++;
+    }
+    return -1;
+  }
+
+  /**
+   * Elimina el primer nodo que tenga ese valor.
+   * @returns {boolean} true si se eliminó, false si no existía
+   */
+  eliminar(valor) {
+    if (this.cabeza === null) return false;
+
+    // Caso 1: el nodo a eliminar es la cabeza -> la cabeza pasa al siguiente
+    if (this.cabeza.valor === valor) {
+      this.cabeza = this.cabeza.siguiente;
+      return true;
+    }
+
+    // Caso 2: está en el medio o al final -> se "salta" el nodo
+    // enlazando el anterior con el siguiente del eliminado
+    let anterior = this.cabeza;
+    while (anterior.siguiente !== null) {
+      if (anterior.siguiente.valor === valor) {
+        anterior.siguiente = anterior.siguiente.siguiente;
+        return true;
+      }
+      anterior = anterior.siguiente;
+    }
+    return false;
+  }
+
+  /** Devuelve los valores en un array (útil para dibujarlos en pantalla). */
+  aArray() {
+    const valores = [];
+    let actual = this.cabeza;
+    while (actual !== null) {
+      valores.push(actual.valor);
+      actual = actual.siguiente;
+    }
+    return valores;
+  }
+}
+
+/* ============================================================
+   INTERFAZ
+   ============================================================ */
+
+const lista = new ListaEnlazada();   // instancia única de la lista
+
+/** Muestra un mensaje debajo del título. */
+function mensaje(texto) {
+  document.getElementById("mensaje").textContent = texto;
+}
+
+/** Lee el valor del campo; devuelve null si está vacío. */
+function leerValor() {
+  const valor = document.getElementById("valor").value.trim();
+  if (valor === "") {
+    mensaje("Ingresa un valor primero.");
+    return null;
+  }
+  return valor;
+}
+
+/**
+ * Redibuja los nodos como círculos azules.
+ * @param {number} resaltar - posición del nodo a resaltar (opcional)
+ */
+function dibujarLista(resaltar = -1) {
+  const contenedor = document.getElementById("lista");
+  contenedor.innerHTML = "";
+
+  lista.aArray().forEach((valor, i) => {
+    const circulo = document.createElement("div");
+    circulo.className = "nodo" + (i === resaltar ? " encontrado" : "");
+    circulo.textContent = valor;   // textContent evita insertar HTML del usuario
+    contenedor.appendChild(circulo);
+  });
+}
+
+/** Botón Agregar: añade el valor al final y actualiza la lista. */
+function agregar() {
+  const valor = leerValor();
+  if (valor === null) return;
+
+  lista.agregar(valor);
+  mensaje(`Se agregó "${valor}" a la lista.`);
+  dibujarLista();
+
+  document.getElementById("valor").value = "";
+  document.getElementById("valor").focus();
+}
+
+/** Botón Buscar: informa si existe y resalta el nodo encontrado. */
+function buscar() {
+  const valor = leerValor();
+  if (valor === null) return;
+
+  const posicion = lista.buscar(valor);
+  if (posicion === -1) {
+    mensaje(`El valor "${valor}" no se encuentra en la lista.`);
+    dibujarLista();
+  } else {
+    mensaje(`El valor "${valor}" se encuentra en la posición ${posicion + 1}.`);
+    dibujarLista(posicion);
+  }
+}
+
+/** Botón Eliminar: quita el nodo y actualiza la lista. */
+function eliminar() {
+  const valor = leerValor();
+  if (valor === null) return;
+
+  if (lista.eliminar(valor)) mensaje(`Se eliminó "${valor}" de la lista.`);
+  else mensaje(`El valor "${valor}" no se encuentra en la lista.`);
+
+  dibujarLista();
+  document.getElementById("valor").value = "";
+}
+
+// Permite agregar con la tecla Enter dentro del campo
+document.getElementById("valor").addEventListener("keydown", e => {
+  if (e.key === "Enter") agregar();
+});
+</script>
+</body>
+</html>
