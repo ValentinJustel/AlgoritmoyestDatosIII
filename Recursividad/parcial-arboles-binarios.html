@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examen - Algoritmos y Estructuras de Datos III</title>
+  <style>
+    /* Estilos básicos para organizar el formulario y el panel de resultados en pantalla */
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 840px;
+      margin: 28px auto;
+      padding: 0 16px;
+      line-height: 1.5;
+      background-color: #fafafa;
+      color: #222;
+    }
+    .bloque {
+      background: #fff;
+      border: 1px solid #d4d4d8;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 18px;
+    }
+    .campo {
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      border: 1px solid #a1a1aa;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px 16px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #1d4ed8;
+      color: #fff;
+    }
+    button:hover {
+      background-color: #1e40af;
+    }
+    pre {
+      background: #111827;
+      color: #f9fafb;
+      padding: 14px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Algoritmos y Estructuras de Datos III — Examen</h1>
+
+  <!-- =====================================================================
+       FORMULARIO DE INGRESO DE DATOS
+       Cumple con la consigna de ingresar todos los datos por formulario.
+       Viene precargado con los valores solicitados en el enunciado para
+       facilitar la prueba o modificarlos libremente.
+       ===================================================================== -->
+  <form id="formExamen" class="bloque">
+    <h2>Ingreso de datos</h2>
+
+    <!-- Ejercicio 1: cantidad n de números naturales -->
+    <div class="campo">
+      <label for="inputN">1. Cantidad n de números naturales a sumar:</label>
+      <input type="number" id="inputN" min="0" value="5" required />
+    </div>
+
+    <!-- Ejercicio 2: arreglo ordenado y valor objetivo para búsqueda binaria -->
+    <div class="campo">
+      <label for="inputArreglo">2a. Arreglo ordenado de enteros (separados por coma):</label>
+      <input type="text" id="inputArreglo" value="10, 20, 25, 30, 45, 50, 80, 90" required />
+    </div>
+
+    <div class="campo">
+      <label for="inputObjetivoBin">2b. Valor a buscar con búsqueda binaria recursiva:</label>
+      <input type="number" id="inputObjetivoBin" value="30" required />
+    </div>
+
+    <!-- Ejercicio 3: valores iniciales para cargar el Árbol Binario de Búsqueda -->
+    <div class="campo">
+      <label for="inputValoresArbol">3. Valores para cargar el árbol (separados por coma):</label>
+      <input type="text" id="inputValoresArbol" value="45, 20, 10, 30, 80, 50, 90, 25" required />
+    </div>
+
+    <!-- Ejercicio 5: valores a buscar recursivamente dentro del árbol -->
+    <div class="campo">
+      <label for="inputBuscarArbol">5. Valores a buscar en el árbol (separados por coma):</label>
+      <input type="text" id="inputBuscarArbol" value="30, 99" required />
+    </div>
+
+    <button type="submit">Resolver y mostrar en pantalla</button>
+  </form>
+
+  <!-- =====================================================================
+       SALIDA EN PANTALLA
+       Muestra los resultados de todos los ejercicios tras enviar el formulario.
+       ===================================================================== -->
+  <section class="bloque">
+    <h2>Resultados en pantalla</h2>
+    <pre id="pantallaSalida">Completá el formulario y hacé clic en "Resolver y mostrar en pantalla".</pre>
+  </section>
+
+  <script>
+    /* =====================================================================
+       EJERCICIO 1: SUMA RECURSIVA DE LOS PRIMEROS n NÚMEROS NATURALES
+       - Caso base: si n <= 0 retorna 0; si n === 1 retorna 1.
+       - Caso recursivo: suma n al resultado de la llamada con (n - 1).
+       ===================================================================== */
+    function sumaNaturalesRecursiva(n) {
+      if (n <= 0) {
+        return 0; // Caso base para 0 o valores no positivos
+      }
+      if (n === 1) {
+        return 1; // Caso base: el primer número natural es 1
+      }
+      return n + sumaNaturalesRecursiva(n - 1); // Paso recursivo reduciendo n
+    }
+
+    /* =====================================================================
+       EJERCICIO 2: BÚSQUEDA BINARIA RECURSIVA CON CONTADOR DE ITERACIONES
+       - Requiere un arreglo ordenado ascendentemente.
+       - En cada llamada recursiva incrementa `iteraciones`, calcula el índice
+         central (`medio`) y descarta la mitad donde no puede estar `objetivo`.
+       - Si `inicio > fin`, el elemento no existe en el arreglo.
+       ===================================================================== */
+    function busquedaBinariaRecursiva(arr, objetivo, inicio = 0, fin = arr.length - 1, iteraciones = 0) {
+      // Caso base de fallo: el rango de búsqueda se agotó sin encontrar el valor
+      if (inicio > fin) {
+        return {
+          encontrado: false,
+          indice: -1,
+          iteraciones
+        };
+      }
+
+      // Contabiliza una nueva iteración/paso de comparación
+      iteraciones++;
+      const medio = Math.floor((inicio + fin) / 2);
+
+      // Caso base de éxito: se encontró el objetivo en la posición central
+      if (arr[medio] === objetivo) {
+        return {
+          encontrado: true,
+          indice: medio,
+          iteraciones
+        };
+      }
+
+      // Si el objetivo es menor, se busca recursivamente en la mitad izquierda
+      if (objetivo < arr[medio]) {
+        return busquedaBinariaRecursiva(arr, objetivo, inicio, medio - 1, iteraciones);
+      }
+
+      // Si el objetivo es mayor, se busca recursivamente en la mitad derecha
+      return busquedaBinariaRecursiva(arr, objetivo, medio + 1, fin, iteraciones);
+    }
+
+    /* =====================================================================
+       EJERCICIO 3: ESTRUCTURA DEL ÁRBOL BINARIO DE BÚSQUEDA (BST)
+       - Clase `Nodo`: guarda el `valor` y las referencias a hijo izquierdo
+         (`izq`) y derecho (`der`).
+       - Clase `ArbolBST`: gestiona la `raiz` y la inserción recursiva
+         (menores a la izquierda, mayores a la derecha).
+       ===================================================================== */
+    class Nodo {
+      constructor(valor) {
+        this.valor = valor; // Dato numérico del nodo
+        this.izq = null;    // Puntero al subárbol izquierdo
+        this.der = null;    // Puntero al subárbol derecho
+      }
+    }
+
+    class ArbolBST {
+      constructor() {
+        this.raiz = null; // Árbol inicialmente vacío
+      }
+
+      // Método público para insertar un nuevo valor en el árbol
+      insertar(valor) {
+        this.raiz = this._insertarRecursivo(this.raiz, valor);
+      }
+
+      // Método auxiliar recursivo que ubica el nuevo nodo en su posición BST
+      _insertarRecursivo(nodoActual, valor) {
+        if (nodoActual === null) {
+          return new Nodo(valor); // Lugar encontrado: crea y devuelve el nodo
+        }
+        if (valor < nodoActual.valor) {
+          nodoActual.izq = this._insertarRecursivo(nodoActual.izq, valor);
+        } else if (valor > nodoActual.valor) {
+          nodoActual.der = this._insertarRecursivo(nodoActual.der, valor);
+        }
+        // Si el valor ya existe, no lo duplica y devuelve el nodo sin cambios
+        return nodoActual;
+      }
+
+      /* ===================================================================
+         EJERCICIO 4: RECORRIDOS (PRE-ORDEN, IN-ORDEN, POS-ORDEN) Y HOJAS
+         - Pre-orden:  Raíz -> Izquierda -> Derecha
+         - In-orden:   Izquierda -> Raíz -> Derecha (en BST queda ordenado)
+         - Pos-orden:  Izquierda -> Derecha -> Raíz
+         - Hojas:      nodos que NO tienen hijo izquierdo ni hijo derecho.
+         =================================================================== */
+      recorridoPreOrden(nodo = this.raiz, acumulador = []) {
+        if (nodo === null) return acumulador;
+        acumulador.push(nodo.valor); // 1. Raíz
+        this.recorridoPreOrden(nodo.izq, acumulador); // 2. Subárbol izquierdo
+        this.recorridoPreOrden(nodo.der, acumulador); // 3. Subárbol derecho
+        return acumulador;
+      }
+
+      recorridoInOrden(nodo = this.raiz, acumulador = []) {
+        if (nodo === null) return acumulador;
+        this.recorridoInOrden(nodo.izq, acumulador); // 1. Subárbol izquierdo
+        acumulador.push(nodo.valor); // 2. Raíz
+        this.recorridoInOrden(nodo.der, acumulador); // 3. Subárbol derecho
+        return acumulador;
+      }
+
+      recorridoPosOrden(nodo = this.raiz, acumulador = []) {
+        if (nodo === null) return acumulador;
+        this.recorridoPosOrden(nodo.izq, acumulador); // 1. Subárbol izquierdo
+        this.recorridoPosOrden(nodo.der, acumulador); // 2. Subárbol derecho
+        acumulador.push(nodo.valor); // 3. Raíz
+        return acumulador;
+      }
+
+      // Cuenta de forma recursiva cuántos nodos hoja (sin hijos) hay en el árbol
+      contarHojas(nodo = this.raiz) {
+        if (nodo === null) return 0; // Árbol o rama vacía no aporta hojas
+        if (nodo.izq === null && nodo.der === null) {
+          return 1; // Es un nodo hoja
+        }
+        return this.contarHojas(nodo.izq) + this.contarHojas(nodo.der);
+      }
+
+      /* ===================================================================
+         EJERCICIO 5: BÚSQUEDA RECURSIVA DENTRO DEL ÁRBOL
+         - Compara el valor buscado con el nodo actual:
+           * Si no hay nodo (`null`), retorna `false`.
+           * Si coincide (`nodo.valor === valor`), retorna `true`.
+           * Si es menor, busca en `nodo.izq`; si es mayor, busca en `nodo.der`.
+         =================================================================== */
+      buscarRecursivo(valor, nodo = this.raiz) {
+        if (nodo === null) {
+          return false; // No se encontró el valor en esta rama
+        }
+        if (nodo.valor === valor) {
+          return true; // Valor encontrado
+        }
+        if (valor < nodo.valor) {
+          return this.buscarRecursivo(valor, nodo.izq); // Baja por la izquierda
+        }
+        return this.buscarRecursivo(valor, nodo.der); // Baja por la derecha
+      }
+    }
+
+    /* =====================================================================
+       FUNCIONES AUXILIARES DE ENTRADA Y MANEJO DEL FORMULARIO
+       ===================================================================== */
+
+    // Convierte un texto separado por comas (ej. "45, 20, 10") en array de enteros válidos
+    function parsearEnteros(texto) {
+      return texto
+        .split(",")
+        .map((item) => Number(item.trim()))
+        .filter((num) => item !== "" && !Number.isNaN(num));
+    }
+
+    // Escucha el envío del formulario para ejecutar los 5 ejercicios y mostrar en pantalla
+    document.getElementById("formExamen").addEventListener("submit", function (evento) {
+      evento.preventDefault(); // Evita que la página se recargue al enviar el formulario
+
+      // --- Lectura y ejecución del Ejercicio 1 ---
+      const n = Number(document.getElementById("inputN").value);
+      const resultadoSuma = sumaNaturalesRecursiva(n);
+
+      // --- Lectura y ejecución del Ejercicio 2 ---
+      // Se ordena de menor a mayor para garantizar la precondición de búsqueda binaria
+      const arregloOrdenado = parsearEnteros(document.getElementById("inputArreglo").value)
+        .sort((a, b) => a - b);
+      const objetivoBin = Number(document.getElementById("inputObjetivoBin").value);
+      const resultadoBin = busquedaBinariaRecursiva(arregloOrdenado, objetivoBin);
+
+      // --- Lectura y ejecución del Ejercicio 3: carga del árbol ---
+      const valoresArbol = parsearEnteros(document.getElementById("inputValoresArbol").value);
+      const arbol = new ArbolBST();
+      for (const val of valoresArbol) {
+        arbol.insertar(val);
+      }
+
+      // --- Ejecución del Ejercicio 4: recorridos y cantidad de hojas ---
+      const preOrden = arbol.recorridoPreOrden();
+      const inOrden = arbol.recorridoInOrden();
+      const posOrden = arbol.recorridoPosOrden();
+      const cantidadHojas = arbol.contarHojas();
+
+      // --- Lectura y ejecución del Ejercicio 5: búsqueda de valores en el árbol ---
+      const valoresABuscar = parsearEnteros(document.getElementById("inputBuscarArbol").value);
+      const lineasBusqueda = valoresABuscar.map((val) => {
+        const existe = arbol.buscarRecursivo(val);
+        return `  - Valor ${val}: ${existe ? "SÍ existe en el árbol" : "NO existe en el árbol"}`;
+      });
+
+      // --- Renderizado de todos los resultados en pantalla ---
+      document.getElementById("pantallaSalida").textContent = [
+        "1. SUMA RECURSIVA DE PRIMEROS n NATURALES",
+        `   n = ${n} -> Suma = ${resultadoSuma}`,
+        "",
+        "2. BÚSQUEDA BINARIA RECURSIVA",
+        `   Arreglo ordenado: [${arregloOrdenado.join(", ")}]`,
+        `   Valor buscado: ${objetivoBin}`,
+        `   Estado: ${resultadoBin.encontrado ? `Encontrado (índice ${resultadoBin.indice})` : "No encontrado"}`,
+        `   Iteraciones necesarias: ${resultadoBin.iteraciones}`,
+        "",
+        "3. CARGA DEL ÁRBOL",
+        `   Valores insertados: [${valoresArbol.join(", ")}]`,
+        "",
+        "4. RECORRIDOS Y NODOS HOJA",
+        `   Pre-orden: ${preOrden.join(" - ")}`,
+        `   In-orden:  ${inOrden.join(" - ")}`,
+        `   Pos-orden: ${posOrden.join(" - ")}`,
+        `   Total de nodos hoja: ${cantidadHojas}`,
+        "",
+        "5. BÚSQUEDA RECURSIVA EN EL ÁRBOL",
+        ...lineasBusqueda
+      ].join("\n");
+    });
+  </script>
+</body>
+</html>

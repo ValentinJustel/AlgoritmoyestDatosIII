@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Resolución Parcial de Práctica - AED III</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 860px; margin: 24px auto; padding: 0 16px; line-height: 1.5; }
+    .card { border: 1px solid #ccc; border-radius: 8px; padding: 16px 20px; margin-bottom: 18px; }
+    label { display: block; font-weight: bold; margin-top: 8px; }
+    input { width: 100%; box-sizing: border-box; padding: 6px 8px; margin-top: 4px; }
+    button { margin-top: 12px; padding: 8px 14px; cursor: pointer; font-weight: bold; }
+    pre { background: #f4f4f5; padding: 12px; border-radius: 6px; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border: 1px solid #999; padding: 8px; text-align: left; }
+    th { background: #e4e4e7; }
+  </style>
+</head>
+<body>
+  <h1>Parcial de Práctica — Algoritmos y Estructuras de Datos III</h1>
+
+  <!-- EJERCICIOS 1 AL 4 -->
+  <section class="card">
+    <h2>Ejercicios 1 a 4: Recursividad, Búsqueda Binaria y Árbol BST</h2>
+    <form id="formAlgoritmos">
+      <label for="nPares">1. Valor de n (suma de pares desde 2 hasta n):</label>
+      <input type="number" id="nPares" min="0" value="6" required />
+
+      <label for="arregloBin">2a. Arreglo ordenado (separado por comas):</label>
+      <input type="text" id="arregloBin" value="10, 20, 30, 45, 60, 70, 80, 95" required />
+
+      <label for="valorBin">2b. Valor a buscar con búsqueda binaria:</label>
+      <input type="number" id="valorBin" value="70" required />
+
+      <label for="valoresArbol">3. Valores para cargar el árbol (separados por comas):</label>
+      <input type="text" id="valoresArbol" value="60, 30, 80, 15, 45, 70, 95, 20" required />
+
+      <label for="buscarArbol">4. Valores a buscar en el árbol (separados por comas):</label>
+      <input type="text" id="buscarArbol" value="45, 100" required />
+
+      <button type="submit">Ejecutar Ejercicios 1 a 4</button>
+    </form>
+    <pre id="salidaAlgoritmos">Presioná "Ejecutar Ejercicios 1 a 4" para ver resultados.</pre>
+  </section>
+
+  <!-- EJERCICIO 5 -->
+  <section class="card">
+    <h2>Ejercicio 5: Carga de Productos en Árbol Binario</h2>
+    <form id="formProductos">
+      <label for="nombreProd">Nombre del producto:</label>
+      <input type="text" id="nombreProd" placeholder="Ej: Teclado" required />
+
+      <label for="precioProd">Precio:</label>
+      <input type="number" id="precioProd" min="1" step="any" placeholder="Ej: 28000" required />
+
+      <button type="submit">Agregar producto</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Precio</th>
+        </tr>
+      </thead>
+      <tbody id="tablaProductos"></tbody>
+    </table>
+    <p id="resumenPrecios"><strong>Precio promedio:</strong> $0 | <strong>Mínimo:</strong> $0 | <strong>Máximo:</strong> $0</p>
+  </section>
+
+  <script>
+    // --- FUNCIONES EJERCICIO 1 ---
+    function sumaParesRecursiva(n) {
+      if (n < 2) return 0;
+      if (n % 2 !== 0) return sumaParesRecursiva(n - 1);
+      return n + sumaParesRecursiva(n - 2);
+    }
+
+    // --- FUNCIONES EJERCICIO 2 ---
+    function busquedaBinariaRecursiva(arr, objetivo, inicio = 0, fin = arr.length - 1, llamadas = 0) {
+      if (inicio > fin) return { encontrado: false, indice: -1, llamadas };
+      llamadas++;
+      const medio = Math.floor((inicio + fin) / 2);
+      if (arr[medio] === objetivo) return { encontrado: true, indice: medio, llamadas };
+      if (objetivo < arr[medio]) {
+        return busquedaBinariaRecursiva(arr, objetivo, inicio, medio - 1, llamadas);
+      }
+      return busquedaBinariaRecursiva(arr, objetivo, medio + 1, fin, llamadas);
+    }
+
+    // --- CLASES Y FUNCIONES EJERCICIOS 3 Y 4 ---
+    class Nodo {
+      constructor(valor) {
+        this.valor = valor;
+        this.izq = null;
+        this.der = null;
+      }
+    }
+
+    class ArbolBinarioBusqueda {
+      constructor() {
+        this.raiz = null;
+      }
+      insertar(valor) {
+        this.raiz = this._insertarRec(this.raiz, valor);
+      }
+      _insertarRec(nodo, valor) {
+        if (nodo === null) return new Nodo(valor);
+        if (valor < nodo.valor) nodo.izq = this._insertarRec(nodo.izq, valor);
+        else if (valor > nodo.valor) nodo.der = this._insertarRec(nodo.der, valor);
+        return nodo;
+      }
+      preOrden(nodo = this.raiz, lista = []) {
+        if (nodo === null) return lista;
+        lista.push(nodo.valor);
+        this.preOrden(nodo.izq, lista);
+        this.preOrden(nodo.der, lista);
+        return lista;
+      }
+      inOrden(nodo = this.raiz, lista = []) {
+        if (nodo === null) return lista;
+        this.inOrden(nodo.izq, lista);
+        lista.push(nodo.valor);
+        this.inOrden(nodo.der, lista);
+        return lista;
+      }
+      posOrden(nodo = this.raiz, lista = []) {
+        if (nodo === null) return lista;
+        this.posOrden(nodo.izq, lista);
+        this.posOrden(nodo.der, lista);
+        lista.push(nodo.valor);
+        return lista;
+      }
+      contarHojas(nodo = this.raiz) {
+        if (nodo === null) return 0;
+        if (nodo.izq === null && nodo.der === null) return 1;
+        return this.contarHojas(nodo.izq) + this.contarHojas(nodo.der);
+      }
+      buscar(valor, nodo = this.raiz) {
+        if (nodo === null) return false;
+        if (nodo.valor === valor) return true;
+        return valor < nodo.valor
+          ? this.buscar(valor, nodo.izq)
+          : this.buscar(valor, nodo.der);
+      }
+    }
+
+    // --- CLASES Y FUNCIONES EJERCICIO 5 ---
+    class NodoProducto {
+      constructor(nombre, precio) {
+        this.nombre = nombre;
+        this.precio = precio;
+        this.izq = null;
+        this.der = null;
+      }
+    }
+
+    class ArbolProductos {
+      constructor() {
+        this.raiz = null;
+      }
+      insertar(nombre, precio) {
+        const nuevo = new NodoProducto(nombre, precio);
+        if (this.raiz === null) {
+          this.raiz = nuevo;
+          return;
+        }
+        this._insertarRec(this.raiz, nuevo);
+      }
+      _insertarRec(actual, nuevo) {
+        if (nuevo.precio <= actual.precio) {
+          if (actual.izq === null) actual.izq = nuevo;
+          else this._insertarRec(actual.izq, nuevo);
+        } else {
+          if (actual.der === null) actual.der = nuevo;
+          else this._insertarRec(actual.der, nuevo);
+        }
+      }
+      obtenerOrdenadosPorPrecio(nodo = this.raiz, lista = []) {
+        if (nodo === null) return lista;
+        this.obtenerOrdenadosPorPrecio(nodo.izq, lista);
+        lista.push({ nombre: nodo.nombre, precio: nodo.precio });
+        this.obtenerOrdenadosPorPrecio(nodo.der, lista);
+        return lista;
+      }
+    }
+
+    function calcularEstadisticasPrecios(productosOrdenados) {
+      if (productosOrdenados.length === 0) return { promedio: 0, minimo: 0, maximo: 0 };
+      const suma = productosOrdenados.reduce((acc, p) => acc + p.precio, 0);
+      return {
+        promedio: Number((suma / productosOrdenados.length).toFixed(2)),
+        minimo: productosOrdenados[0].precio,
+        maximo: productosOrdenados[productosOrdenados.length - 1].precio
+      };
+    }
+
+    // --- AUXILIARES DE INTERFAZ ---
+    function parsearNumeros(texto) {
+      return texto
+        .split(",")
+        .map(v => Number(v.trim()))
+        .filter(n => !Number.isNaN(n));
+    }
+
+    document.getElementById("formAlgoritmos").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const n = Number(document.getElementById("nPares").value);
+      const sumaPares = sumaParesRecursiva(n);
+
+      const arr = parsearNumeros(document.getElementById("arregloBin").value).sort((a, b) => a - b);
+      const objBin = Number(document.getElementById("valorBin").value);
+      const resBin = busquedaBinariaRecursiva(arr, objBin);
+
+      const valores = parsearNumeros(document.getElementById("valoresArbol").value);
+      const arbol = new ArbolBinarioBusqueda();
+      valores.forEach(v => arbol.insertar(v));
+
+      const aBuscar = parsearNumeros(document.getElementById("buscarArbol").value);
+      const busquedasTxt = aBuscar.map(v => `  - ${v}: ${arbol.buscar(v) ? "Existe" : "No existe"}`);
+
+      document.getElementById("salidaAlgoritmos").textContent = [
+        `1. Suma de pares hasta ${n}: ${sumaPares}`,
+        `2. Búsqueda binaria de ${objBin}: ${resBin.encontrado ? "Encontrado (índice " + resBin.indice + ")" : "No encontrado"} | Llamadas: ${resBin.llamadas}`,
+        `3. Árbol cargado con: [${valores.join(", ")}]`,
+        `4. Pre-orden: ${arbol.preOrden().join(" -> ")}`,
+        `   In-orden:  ${arbol.inOrden().join(" -> ")}`,
+        `   Pos-orden: ${arbol.posOrden().join(" -> ")}`,
+        `   Nodos hoja: ${arbol.contarHojas()}`,
+        `   Búsqueda en árbol:`,
+        ...busquedasTxt
+      ].join("\n");
+    });
+
+    const arbolProductos = new ArbolProductos();
+
+    function actualizarTablaProductos() {
+      const ordenados = arbolProductos.obtenerOrdenadosPorPrecio();
+      const tbody = document.getElementById("tablaProductos");
+      tbody.innerHTML = "";
+
+      ordenados.forEach(p => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${p.nombre}</td><td>$${p.precio}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      const stats = calcularEstadisticasPrecios(ordenados);
+      document.getElementById("resumenPrecios").innerHTML =
+        `<strong>Precio promedio:</strong> $${stats.promedio} | <strong>Mínimo:</strong> $${stats.minimo} | <strong>Máximo:</strong> $${stats.maximo}`;
+    }
+
+    document.getElementById("formProductos").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById("nombreProd").value.trim();
+      const precio = Number(document.getElementById("precioProd").value);
+      if (!nombre || Number.isNaN(precio) || precio <= 0) return;
+
+      arbolProductos.insertar(nombre, precio);
+      actualizarTablaProductos();
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+Se separa en dos partes: la estructura del nodo/árbol con
+ inserción recursiva (Ejercicio 3) y los métodos de recorridos, conteo de hojas y búsqueda (Ejercicio 4).
+
+ class Nodo {
+  constructor(valor) {
+    this.valor = valor;
+    this.izq = null;
+    this.der = null;
+  }
+}
+
+class ArbolBinarioBusqueda {
+  constructor() {
+    this.raiz = null;
+  }
+
+  // Inserción pública
+  insertar(valor) {
+    this.raiz = this._insertarRec(this.raiz, valor);
+  }
+
+  // Inserción recursiva (menores a la izquierda, mayores a la derecha)
+  _insertarRec(nodo, valor) {
+    if (nodo === null) return new Nodo(valor);
+
+    if (valor < nodo.valor) {
+      nodo.izq = this._insertarRec(nodo.izq, valor);
+    } else if (valor > nodo.valor) {
+      nodo.der = this._insertarRec(nodo.der, valor);
+    }
+    return nodo;
+  }
+
+  // Recorrido Pre-orden: Raíz -> Izquierda -> Derecha
+  preOrden(nodo = this.raiz, lista = []) {
+    if (nodo === null) return lista;
+    lista.push(nodo.valor);
+    this.preOrden(nodo.izq, lista);
+    this.preOrden(nodo.der, lista);
+    return lista;
+  }
+
+  // Recorrido In-orden: Izquierda -> Raíz -> Derecha
+  inOrden(nodo = this.raiz, lista = []) {
+    if (nodo === null) return lista;
+    this.inOrden(nodo.izq, lista);
+    lista.push(nodo.valor);
+    this.inOrden(nodo.der, lista);
+    return lista;
+  }
+
+  // Recorrido Pos-orden: Izquierda -> Derecha -> Raíz
+  posOrden(nodo = this.raiz, lista = []) {
+    if (nodo === null) return lista;
+    this.posOrden(nodo.izq, lista);
+    this.posOrden(nodo.der, lista);
+    lista.push(nodo.valor);
+    return lista;
+  }
+
+  // Conteo recursivo de nodos hoja (nodos sin hijos)
+  contarHojas(nodo = this.raiz) {
+    if (nodo === null) return 0;
+    if (nodo.izq === null && nodo.der === null) return 1;
+    return this.contarHojas(nodo.izq) + this.contarHojas(nodo.der);
+  }
+
+  // Búsqueda recursiva dentro del árbol
+  buscar(valor, nodo = this.raiz) {
+    if (nodo === null) return false;
+    if (nodo.valor === valor) return true;
+
+    if (valor < nodo.valor) {
+      return this.buscar(valor, nodo.izq);
+    }
+    return this.buscar(valor, nodo.der);
+  }
+}

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Parcial 2 - Creación de Claves Seguras</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 780px;
+      margin: 30px auto;
+      padding: 0 15px;
+      line-height: 1.5;
+    }
+    .caja {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
+    }
+    input {
+      padding: 6px 10px;
+      font-size: 15px;
+      width: 120px;
+    }
+    button {
+      padding: 7px 14px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .error {
+      color: #c00;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+    .resultado-linea {
+      margin: 6px 0;
+      font-family: monospace;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Trabajo Práctico / Parcial 2: Creación de claves seguras</h1>
+
+  <div class="caja">
+    <form id="formClave">
+      <label for="longitud">Ingrese el tamaño de la contraseña (mínimo 8 caracteres):</label>
+      <input type="number" id="longitud" min="8" max="92" value="12" required />
+      <button type="submit">Generar clave</button>
+      <p id="mensajeError" class="error"></p>
+    </form>
+  </div>
+
+  <div class="caja" id="panelResultados" style="display: none;">
+    <h2>Resultados</h2>
+    <div id="salida"></div>
+  </div>
+
+  <script>
+    // 1. Grupos de caracteres definidos en la consigna
+    const mayusculas = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const minusculas = "abcdefghijklmnopqrstuvwxyz";
+    const numeros = "0123456789";
+    const especiales = "!@#$%^&*()_+={}[]\\:;<>,.?/";
+
+    // 2. Estructura del Árbol Binario (estilo de la cátedra)
+    function Tree(value) {
+      this.data = value;
+      this.right = null;
+      this.left = null;
+    }
+
+    Tree.prototype.add = function (value) {
+      if (value < this.data) {
+        if (this.left == null) {
+          this.left = new Tree(value);
+        } else {
+          this.left.add(value);
+        }
+      } else {
+        if (this.right == null) {
+          this.right = new Tree(value);
+        } else {
+          this.right.add(value);
+        }
+      }
+    };
+
+    // Contenedor para los recorridos
+    let contenedor = [];
+
+    // Recorrido Pre-Orden (Raíz - Izquierda - Derecha)
+    Tree.prototype.recorrido1 = function () {
+      contenedor.push(this.data);
+      if (this.left) {
+        this.left.recorrido1();
+      }
+      if (this.right) {
+        this.right.recorrido1();
+      }
+    };
+
+    // Recorrido In-Orden (Izquierda - Raíz - Derecha)
+    Tree.prototype.recorrido2 = function () {
+      if (this.left) {
+        this.left.recorrido2();
+      }
+      contenedor.push(this.data);
+      if (this.right) {
+        this.right.recorrido2();
+      }
+    };
+
+    // Recorrido Post-Orden (Izquierda - Derecha - Raíz)
+    Tree.prototype.recorrido3 = function () {
+      if (this.left) {
+        this.left.recorrido3();
+      }
+      if (this.right) {
+        this.right.recorrido3();
+      }
+      contenedor.push(this.data);
+    };
+
+    // 3. Funciones auxiliares para cantidades aleatorias y selección sin repetir
+    function numeroAleatorio(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Genera 4 cantidades aleatorias (>= 1 cada una) cuya suma sea igual a `total`
+    function obtenerCantidadesAleatorias(total) {
+      let cMayus = 1;
+      let cMinus = 1;
+      let cNum = 1;
+      let cEsp = 1;
+
+      let restantes = total - 4;
+
+      while (restantes > 0) {
+        let grupoElegido = numeroAleatorio(1, 4);
+        if (grupoElegido === 1 && cMayus < mayusculas.length) {
+          cMayus++;
+          restantes--;
+        } else if (grupoElegido === 2 && cMinus < minusculas.length) {
+          cMinus++;
+          restantes--;
+        } else if (grupoElegido === 3 && cNum < numeros.length) {
+          cNum++;
+          restantes--;
+        } else if (grupoElegido === 4 && cEsp < especiales.length) {
+          cEsp++;
+          restantes--;
+        }
+      }
+
+      return { cMayus, cMinus, cNum, cEsp };
+    }
+
+    // Elige `cantidad` caracteres al azar de `grupo` sin repetir ninguno
+    function elegirSinRepetir(grupo, cantidad, usados) {
+      let elegidos = [];
+      while (elegidos.length < cantidad) {
+        let indice = numeroAleatorio(0, grupo.length - 1);
+        let caracter = grupo[indice];
+        if (!usados.includes(caracter)) {
+          usados.push(caracter);
+          elegidos.push(caracter);
+        }
+      }
+      return elegidos;
+    }
+
+    // Mezcla el array de caracteres antes de insertarlos en el árbol
+    function mezclar(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        let j = numeroAleatorio(0, i);
+        let aux = array[i];
+        array[i] = array[j];
+        array[j] = aux;
+      }
+      return array;
+    }
+
+    // 4. Evento del formulario
+    document.getElementById("formClave").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const errorEl = document.getElementById("mensajeError");
+      const panelEl = document.getElementById("panelResultados");
+      const salidaEl = document.getElementById("salida");
+      errorEl.textContent = "";
+
+      const longitud = parseInt(document.getElementById("longitud").value, 10);
+      const maxCaracteresUnicos =
+        mayusculas.length + minusculas.length + numeros.length + especiales.length;
+
+      if (isNaN(longitud) || longitud < 8) {
+        errorEl.textContent = "Error: la contraseña debe tener al menos 8 caracteres.";
+        panelEl.style.display = "none";
+        return;
+      }
+
+      if (longitud > maxCaracteresUnicos) {
+        errorEl.textContent =
+          "Error: el máximo sin repetir caracteres es " + maxCaracteresUnicos + ".";
+        panelEl.style.display = "none";
+        return;
+      }
+
+      // Paso A: Determinar cantidades aleatorias por grupo
+      const { cMayus, cMinus, cNum, cEsp } = obtenerCantidadesAleatorias(longitud);
+
+      // Paso B: Elegir los caracteres sin repetir
+      let usados = [];
+      let caracteresClave = [
+        ...elegirSinRepetir(mayusculas, cMayus, usados),
+        ...elegirSinRepetir(minusculas, cMinus, usados),
+        ...elegirSinRepetir(numeros, cNum, usados),
+        ...elegirSinRepetir(especiales, cEsp, usados)
+      ];
+
+      // Mezclamos para que la raíz del árbol pueda ser de cualquier grupo
+      caracteresClave = mezclar(caracteresClave);
+
+      // Paso C: Cargar los caracteres en el árbol binario
+      let arbol = new Tree(caracteresClave[0]);
+      for (let i = 1; i < caracteresClave.length; i++) {
+        arbol.add(caracteresClave[i]);
+      }
+
+      // Paso D: Obtener los tres recorridos
+      contenedor = [];
+      arbol.recorrido1();
+      const clavePreOrden = contenedor.join("");
+
+      contenedor = [];
+      arbol.recorrido2();
+      const claveInOrden = contenedor.join("");
+
+      contenedor = [];
+      arbol.recorrido3();
+      const clavePostOrden = contenedor.join("");
+
+      // Paso E: Mostrar resultados en pantalla
+      panelEl.style.display = "block";
+      salidaEl.innerHTML = `
+        <p><strong>Longitud solicitada:</strong> ${longitud} caracteres</p>
+        <p><strong>Distribución aleatoria por grupo:</strong>
+          Mayúsculas: ${cMayus} | Minúsculas: ${cMinus} | Números: ${cNum} | Especiales: ${cEsp}
+          (Total: ${cMayus + cMinus + cNum + cEsp})
+        </p>
+        <p><strong>Orden de inserción en el árbol:</strong> <code>${caracteresClave.join(" ")}</code></p>
+        <hr />
+        <div class="resultado-linea"><strong>Contraseña en Pre-orden:</strong> ${clavePreOrden}</div>
+        <div class="resultado-linea"><strong>Contraseña en In-orden:</strong> ${claveInOrden}</div>
+        <div class="resultado-linea"><strong>Contraseña en Post-orden:</strong> ${clavePostOrden}</div>
+      `;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio de Recursividad</title>
+</head>
+<body>
+    
+</body>
+
+<script>
+    function sumaNaturalesRecursiva(n) {
+      if (n <= 0) {
+        return 0; // Caso base para 0 o valores no positivos
+      }
+      if (n === 1) {
+        return 1; // Caso base: el primer número natural es 1
+      }
+      return n + sumaNaturalesRecursiva(n - 1); // Paso recursivo reduciendo n
+    }
+</script>
+</html>

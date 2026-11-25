@@ -1,0 +1,249 @@
+/**
+ * ============================================================================
+ * ARCHIVO: codificacion_arbol_binario.js
+ * TEMA: Codificación y recorridos de un Árbol Binario en JavaScript
+ * FUENTE: Codificación de un árbol binario.pdf
+ *
+ * ¿QUÉ ES ESTE ARCHIVO?
+ * Es un script único y autocontenido que reúne los conceptos y etapas del PDF
+ * divididos en segmentos claros:
+ *   1. Definición de la estructura del nodo/árbol (Tree).
+ *   2. Enlace manual de nodos.
+ *   3. Inserción básica sin recursión (limitada a un nivel).
+ *   4. Inserción recursiva ramificada (construcción completa del árbol).
+ *   5. Recorridos del árbol: Pre-Orden, In-Orden y Post-Orden.
+ *
+ * ¿PARA QUÉ SIRVE?
+ * Sirve como material de estudio y referencia práctica para entender cómo se
+ * representa un árbol binario en memoria mediante referencias (`left` y `right`),
+ * cómo se insertan nodos según su valor y cómo se recorren sus elementos en
+ * distintos órdenes.
+ * ============================================================================
+ */
+
+
+// ============================================================================
+// SEGMENTO 1: Definición de la estructura del árbol (función constructora Tree)
+// ============================================================================
+/**
+ * ¿QUÉ ES?
+ * Define el molde (función constructora) de un nodo/árbol binario. Cada instancia
+ * almacena un dato (`data`) y dos punteros/referencias a hijos (`left` y `right`)
+ * inicializados en `null`.
+ *
+ * ¿PARA QUÉ SIRVE?
+ * Permite crear nodos individuales que pueden conectarse entre sí para formar
+ * una estructura jerárquica en forma de árbol.
+ */
+function Tree(value) {
+  this.data = value;   // Valor o dato almacenado en el nodo actual
+  this.right = null; // Referencia al subárbol / hijo derecho (vacío por defecto)
+  this.left = null;  // Referencia al subárbol / hijo izquierdo (vacío por defecto)
+}
+
+// Ejemplo inicial del PDF: creación de un único nodo raíz con valor 18
+const nodoRaizInicial = new Tree(18);
+console.log("[Segmento 1 - Nodo raíz 18]:", nodoRaizInicial);
+
+
+// ============================================================================
+// SEGMENTO 2: Asignación manual de nodos a `left` y `right`
+// ============================================================================
+/**
+ * ¿QUÉ ES?
+ * Instanciación manual de varios nodos (`Tree`) y asignación directa de sus
+ * propiedades `left` y `right` siguiendo el criterio del PDF: valores menores a
+ * la izquierda y valores mayores o iguales a la derecha.
+ *
+ * ¿PARA QUÉ SIRVE?
+ * Muestra de forma explícita cómo se enlazan nodos en memoria sin automatización,
+ * construyendo un pequeño árbol de ejemplo (raíz 18, izquierda 8, derecha 23
+ * con hijo derecho 35).
+ */
+function ejecutarSegmento2Manual() {
+  const tree = new Tree(18);
+  const tree2 = new Tree(23);
+  const tree3 = new Tree(8);
+  const tree4 = new Tree(35);
+
+  tree.right = tree2;       // 23 es mayor que 18 -> va a la derecha de 18
+  tree.left = tree3;        // 8 es menor que 18 -> va a la izquierda de 18
+  tree.right.right = tree4; // 35 es mayor que 23 -> va a la derecha de 23
+
+  console.log("[Segmento 2 - Árbol armado manualmente]:", tree);
+}
+
+ejecutarSegmento2Manual();
+
+
+// ============================================================================
+// SEGMENTO 3: Método `add` básico (sin recursión / un solo nivel)
+// ============================================================================
+/**
+ * ¿QUÉ ES?
+ * Una primera versión del método `add` agregada al prototipo de `Tree` que
+ * compara `value` con `this.data` y asigna directamente `new Tree(value)` a
+ * `this.left` o `this.right`.
+ *
+ * ¿PARA QUÉ SIRVE?
+ * Ilustra cómo automatizar la decisión izquierda/derecha en un primer paso,
+ * y deja ver su limitación: si ya existe un hijo en esa rama, lo sobrescribe
+ * en vez de seguir bajando por el árbol.
+ */
+function TreeBasico(value) {
+  this.data = value;
+  this.right = null;
+  this.left = null;
+}
+
+TreeBasico.prototype.add = function (value) {
+  if (value < this.data) {
+    this.left = new TreeBasico(value); // Sobrescribe si ya había hijo izquierdo
+  } else {
+    this.right = new TreeBasico(value); // Sobrescribe si ya había hijo derecho
+  }
+};
+
+function ejecutarSegmento3Basico() {
+  const tree = new TreeBasico(18);
+  tree.add(10);
+  tree.add(30);
+  console.log("[Segmento 3 - Inserción básica (18, 10, 30)]:", tree);
+}
+
+ejecutarSegmento3Basico();
+
+
+// ============================================================================
+// SEGMENTO 4: Inserción recursiva ramificada (`Tree.prototype.add`)
+// ============================================================================
+/**
+ * ¿QUÉ ES?
+ * Versión recursiva de `add` en `Tree.prototype`. Antes de insertar un valor,
+ * comprueba si el puntero correspondiente (`left` o `right`) es `null`:
+ *   - Si es `null`, crea y enlaza el nuevo nodo `Tree(value)`.
+ *   - Si ya existe un nodo, llama recursivamente a `.add(value)` sobre ese hijo
+ *     para seguir bajando hasta encontrar un hueco libre.
+ *
+ * ¿PARA QUÉ SIRVE?
+ * Permite construir árboles de múltiples niveles y ramificaciones sin perder
+ * nodos existentes al insertar nuevos valores.
+ */
+Tree.prototype.add = function (value) {
+  if (value < this.data) {
+    if (this.left == null) {
+      this.left = new Tree(value);
+    } else {
+      this.left.add(value);
+    }
+  } else {
+    if (this.right == null) {
+      this.right = new Tree(value);
+    } else {
+      this.right.add(value);
+    }
+  }
+};
+
+// Construcción del árbol principal del PDF con valores: 18, 10, 30, 5, 25
+// Estructura resultante:
+//         18
+//        /  \
+//      10    30
+//     /     /
+//    5     25
+const tree = new Tree(18);
+tree.add(10);
+tree.add(30);
+tree.add(5);
+tree.add(25);
+
+console.log("[Segmento 4 - Árbol ramificado (18, 10, 30, 5, 25)]:", tree);
+
+
+// ============================================================================
+// SEGMENTO 5: Recorridos del árbol binario (Pre-Orden, In-Orden, Post-Orden)
+// ============================================================================
+/**
+ * ¿QUÉ ES?
+ * Tres métodos recursivos en `Tree.prototype` que visitan todos los nodos del
+ * árbol y guardan sus valores en un arreglo contenedor (`contenedor`), variando
+ * el momento en que se registra el nodo actual (`this.data`) respecto a sus
+ * subárboles izquierdo (`this.left`) y derecho (`this.right`).
+ *
+ * ¿PARA QUÉ SIRVE?
+ * Cada recorrido ordena o extrae la información del árbol para distintos fines:
+ *   - Pre-Orden (Raíz -> Izquierda -> Derecha): útil para copiar/clonar o
+ *     serializar la estructura de un árbol.
+ *   - In-Orden (Izquierda -> Raíz -> Derecha): en un árbol ordenado por valor,
+ *     devuelve los elementos ordenados de menor a mayor.
+ *   - Post-Orden (Izquierda -> Derecha -> Raíz): útil para eliminar/liberar
+ *     nodos o evaluar expresiones donde primero se resuelven los hijos.
+ */
+
+// Contenedor donde se acumulan los valores visitados durante un recorrido
+let contenedor = [];
+
+/**
+ * Recorrido Pre-Orden (`recorrido1`):
+ * 1) Visita/guarda la raíz actual (`this.data`).
+ * 2) Recorre recursivamente el subárbol izquierdo.
+ * 3) Recorre recursivamente el subárbol derecho.
+ */
+Tree.prototype.recorrido1 = function () {
+  // Recorrido Pre-Order
+  contenedor.push(this.data);
+  if (this.left) {
+    this.left.recorrido1();
+  }
+  if (this.right) {
+    this.right.recorrido1();
+  }
+};
+
+/**
+ * Recorrido In-Orden (`recorrido2`):
+ * 1) Recorre recursivamente el subárbol izquierdo.
+ * 2) Visita/guarda la raíz actual (`this.data`).
+ * 3) Recorre recursivamente el subárbol derecho.
+ */
+Tree.prototype.recorrido2 = function () {
+  // Recorrido In-Order
+  if (this.left) {
+    this.left.recorrido2();
+  }
+  contenedor.push(this.data);
+  if (this.right) {
+    this.right.recorrido2();
+  }
+};
+
+/**
+ * Recorrido Post-Orden (`recorrido3`):
+ * 1) Recorre recursivamente el subárbol izquierdo.
+ * 2) Recorre recursivamente el subárbol derecho.
+ * 3) Visita/guarda la raíz actual (`this.data`).
+ */
+Tree.prototype.recorrido3 = function () {
+  // Recorrido Post-Order
+  if (this.left) {
+    this.left.recorrido3();
+  }
+  if (this.right) {
+    this.right.recorrido3();
+  }
+  contenedor.push(this.data);
+};
+
+// Ejecución de los tres recorridos (reiniciando `contenedor` entre cada uno)
+contenedor = [];
+tree.recorrido1();
+console.log("[Segmento 5 - Pre-Orden]:", contenedor);  // [18, 10, 5, 30, 25]
+
+contenedor = [];
+tree.recorrido2();
+console.log("[Segmento 5 - In-Orden]:", contenedor);   // [5, 10, 18, 25, 30]
+
+contenedor = [];
+tree.recorrido3();
+console.log("[Segmento 5 - Post-Orden]:", contenedor); // [5, 10, 25, 30, 18]

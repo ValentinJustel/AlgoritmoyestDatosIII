@@ -1,0 +1,17 @@
+Calcula la suma de todos los números pares desde 2 hasta n. Si n es impar, 
+primero lo ajusta al par inmediato anterior (n - 1) para empezar desde un par válido.
+
+function sumaParesRecursiva(n) {
+  // Caso base: si n es menor a 2, no quedan pares positivos para sumar
+  if (n < 2) {
+    return 0;
+  }
+
+  // Si n es impar, bajamos una unidad para quedarnos con el par anterior
+  if (n % 2 !== 0) {
+    return sumaParesRecursiva(n - 1);
+  }
+
+  // Paso recursivo: suma el par actual y retrocede de 2 en 2
+  return n + sumaParesRecursiva(n - 2);
+}

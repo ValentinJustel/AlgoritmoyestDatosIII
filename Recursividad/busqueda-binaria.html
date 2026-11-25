@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Busqueda Binaria</title>
+</head>
+
+<body>
+  <h1>Busqueda binaria</h1>
+  <script>
+    let numeros = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    function busquedaBinaria(numeros, valor) {
+      let medio = Math.floor(numeros.length / 2);
+
+      if (parseInt(numeros[medio]) == parseInt(valor)) {
+        return true;
+      }
+
+      if (numeros.length == 1) {
+        return false;
+      }
+
+      if (parseInt(valor) > parseInt(numeros[medio])) {
+        return busquedaBinaria(numeros.slice(medio), valor);
+      } else {
+        return busquedaBinaria(numeros.slice(0, medio), valor);
+      }
+    }
+
+    let valor1 = 10;
+    console.log(busquedaBinaria(numeros, valor1));
+  </script>
+</body>
+
+</html>
+```[cite: 18]
+
+*(Nota: en este código de ejemplo, si el valor no está y quedan 2 elementos en el arreglo —por ejemplo `[8, 9]` buscando `10`—, `medio` es `1`, `numeros.slice(1)` vuelve a dar `[8, 9]` y puede generar recursión infinita; si vas a usarlo en tu entrega, conviene usar `numeros.slice(medio + 1)` al ir por la derecha y `numeros.length === 0` como caso base).* ¿Querés que le agreguemos el contador de iteraciones que pide el punto 2 de tu examen[cite: 1]?

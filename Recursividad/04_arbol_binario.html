@@ -1,0 +1,64 @@
+Almacena objetos { nombre, precio } ordenando por precio. El recorrido In-orden devuelve los productos ordenados de menor a mayor precio, y una función auxiliar calcula promedio, mínimo y máximo.
+
+class NodoProducto {
+  constructor(nombre, precio) {
+    this.nombre = nombre;
+    this.precio = precio;
+    this.izq = null;
+    this.der = null;
+  }
+}
+
+class ArbolProductos {
+  constructor() {
+    this.raiz = null;
+  }
+
+  insertar(nombre, precio) {
+    const nuevo = new NodoProducto(nombre, precio);
+    if (this.raiz === null) {
+      this.raiz = nuevo;
+      return;
+    }
+    this._insertarRec(this.raiz, nuevo);
+  }
+
+  _insertarRec(actual, nuevo) {
+    // Precios menores o iguales van a la izquierda; mayores a la derecha
+    if (nuevo.precio <= actual.precio) {
+      if (actual.izq === null) actual.izq = nuevo;
+      else this._insertarRec(actual.izq, nuevo);
+    } else {
+      if (actual.der === null) actual.der = nuevo;
+      else this._insertarRec(actual.der, nuevo);
+    }
+  }
+
+  // Recorrido In-orden: devuelve los productos ordenados de menor a mayor precio
+  obtenerOrdenadosPorPrecio(nodo = this.raiz, lista = []) {
+    if (nodo === null) return lista;
+    this.obtenerOrdenadosPorPrecio(nodo.izq, lista);
+    lista.push({ nombre: nodo.nombre, precio: nodo.precio });
+    this.obtenerOrdenadosPorPrecio(nodo.der, lista);
+    return lista;
+  }
+}
+
+// Función pura para calcular promedio, mínimo y máximo sobre la lista ordenada
+function calcularEstadisticasPrecios(productosOrdenados) {
+  if (productosOrdenados.length === 0) {
+    return { promedio: 0, minimo: 0, maximo: 0 };
+  }
+
+  let suma = 0;
+  for (const prod of productosOrdenados) {
+    suma += prod.precio;
+  }
+
+  // Como ya viene ordenado de menor a mayor por In-orden:
+  const minimo = productosOrdenados[0].precio;
+  const maximo = productosOrdenados[productosOrdenados.length - 1].precio;
+  const promedio = Number((suma / productosOrdenados.length).toFixed(2));
+
+  return { promedio, minimo, maximo };
+}

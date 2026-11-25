@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2do Parcial - Árbol Binario de Vehículos</title>
+  <style>
+    /* =====================================================================
+       ESTILOS GENERALES Y FONDO
+       Configura el fondo oscuro con un degradado suave que recuerda la
+       estética de la captura y centra el contenido en pantalla.
+       ===================================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #ffffff;
+      background:
+        linear-gradient(135deg, rgba(15, 23, 42, 0.88), rgba(30, 27, 75, 0.78)),
+        radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.25), transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(217, 119, 6, 0.28), transparent 45%);
+      background-color: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+
+    /* Contenedor principal en dos columnas: formulario a la izquierda y tabla a la derecha */
+    .contenedor-parcial {
+      width: 100%;
+      max-width: 1060px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    @media (max-width: 820px) {
+      .contenedor-parcial {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* =====================================================================
+       TARJETA DEL FORMULARIO ("Datos del vehículo")
+       Aplica efecto translúcido (glassmorphism) y campos con línea inferior.
+       ===================================================================== */
+    .panel-formulario {
+      background: rgba(203, 213, 225, 0.22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 6px;
+      padding: 28px 26px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .panel-formulario h2 {
+      margin: 0 0 24px 0;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .campo {
+      margin-bottom: 22px;
+    }
+
+    .campo label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: #f1f5f9;
+    }
+
+    .campo input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #e2e8f0;
+      color: #ffffff;
+      font-size: 15px;
+      padding: 6px 4px;
+      outline: none;
+    }
+
+    .campo input:focus {
+      border-bottom-color: #3b82f6;
+    }
+
+    .campo input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-cargar {
+      width: 100%;
+      padding: 11px 16px;
+      background-color: #0d6efd;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-cargar:hover {
+      background-color: #0b5ed7;
+    }
+
+    .mensaje-error {
+      margin-top: 10px;
+      color: #fca5a5;
+      font-size: 13px;
+      min-height: 18px;
+    }
+
+    /* =====================================================================
+       PANEL DE TABLA Y ESTADÍSTICAS ("Orden Ascendente")
+       Presenta la tabla ordenada por velocidad y las métricas inferiores.
+       ===================================================================== */
+    .panel-resultados {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 6px;
+      padding: 18px 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .titulo-tabla {
+      margin: 0 0 10px 0;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #d7b282;
+      color: #111827;
+    }
+
+    th, td {
+      border: 1px solid #8c6d46;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #b88b52;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    th:last-child, td:last-child {
+      text-align: right;
+    }
+
+    .estadisticas {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.55;
+      color: #f8fafc;
+    }
+
+    .estadisticas p {
+      margin: 2px 0;
+    }
+  </style>
+</head>
+<body>
+  <main class="contenedor-parcial">
+    <!-- ===================================================================
+         FORMULARIO DE CARGA DE VEHÍCULOS
+         Capta el "Modelo" y la "Velocidad Máxima" para insertar en el árbol.
+         =================================================================== -->
+    <section class="panel-formulario">
+      <h2>Datos del vehículo</h2>
+      <form id="formVehiculo">
+        <div class="campo">
+          <label for="modelo">Modelo</label>
+          <input
+            type="text"
+            id="modelo"
+            placeholder="Ej: Corolla"
+            autocomplete="off"
+            required
+          />
+        </div>
+
+        <div class="campo">
+          <label for="velocidad">Velocidad Máxima</label>
+          <input
+            type="number"
+            id="velocidad"
+            placeholder="Ej: 195"
+            min="1"
+            step="any"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn-cargar">Cargar</button>
+        <div id="mensajeError" class="mensaje-error"></div>
+      </form>
+    </section>
+
+    <!-- ===================================================================
+         SALIDA EN PANTALLA: TABLA ORDENADA Y ESTADÍSTICAS
+         Se actualiza automáticamente cada vez que se carga un vehículo.
+         =================================================================== -->
+    <section class="panel-resultados">
+      <h2 class="titulo-tabla">Orden Ascendente</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            <th>Velocidad</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpoTabla"></tbody>
+      </table>
+
+      <div class="estadisticas">
+        <p id="velPromedio">Velocidad promedio: 0</p>
+        <p id="velMinima">Velocidad mínima: 0</p>
+        <p id="velMaxima">Velocidad máxima: 0</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* =====================================================================
+       1. ESTRUCTURA DEL ÁRBOL BINARIO DE BÚSQUEDA (POR VELOCIDAD MÁXIMA)
+       - Cada `NodoVehiculo` almacena `modelo`, `velocidad` y las referencias
+         a sus hijos `izq` y `der`.
+       - `ArbolVehiculos` inserta nodos ordenando según `velocidad`:
+         * Velocidades menores o iguales van a la izquierda (`izq`).
+         * Velocidades mayores van a la derecha (`der`).
+       ===================================================================== */
+    class NodoVehiculo {
+      constructor(modelo, velocidad) {
+        this.modelo = modelo;
+        this.velocidad = velocidad;
+        this.izq = null;
+        this.der = null;
+      }
+    }
+
+    class ArbolVehiculos {
+      constructor() {
+        this.raiz = null;
+      }
+
+      // Inserta un nuevo vehículo en el árbol de forma recursiva
+      insertar(modelo, velocidad) {
+        const nuevoNodo = new NodoVehiculo(modelo, velocidad);
+
+        if (this.raiz === null) {
+          this.raiz = nuevoNodo;
+          return;
+        }
+
+        this._insertarRecursivo(this.raiz, nuevoNodo);
+      }
+
+      _insertarRecursivo(actual, nuevoNodo) {
+        if (nuevoNodo.velocidad <= actual.velocidad) {
+          if (actual.izq === null) {
+            actual.izq = nuevoNodo;
+          } else {
+            this._insertarRecursivo(actual.izq, nuevoNodo);
+          }
+        } else {
+          if (actual.der === null) {
+            actual.der = nuevoNodo;
+          } else {
+            this._insertarRecursivo(actual.der, nuevoNodo);
+          }
+        }
+      }
+
+      /* ===================================================================
+         2. RECORRIDO IN-ORDEN (IZQUIERDA -> RAÍZ -> DERECHA)
+         Al estar el árbol ordenado por velocidad, el recorrido in-orden
+         devuelve los vehículos ordenados de menor a mayor velocidad.
+         =================================================================== */
+      recorridoInOrden(nodo = this.raiz, resultado = []) {
+        if (nodo === null) {
+          return resultado;
+        }
+
+        this.recorridoInOrden(nodo.izq, resultado);
+        resultado.push({
+          modelo: nodo.modelo,
+          velocidad: nodo.velocidad
+        });
+        this.recorridoInOrden(nodo.der, resultado);
+
+        return resultado;
+      }
+    }
+
+    /* =====================================================================
+       3. CÁLCULO DE ESTADÍSTICAS Y ACTUALIZACIÓN DE LA INTERFAZ
+       - Obtiene los vehículos ordenados mediante el recorrido in-orden.
+       - Dibuja la tabla en pantalla y calcula promedio, mínima y máxima.
+       ===================================================================== */
+    const arbol = new ArbolVehiculos();
+
+    const formVehiculo = document.getElementById("formVehiculo");
+    const inputModelo = document.getElementById("modelo");
+    const inputVelocidad = document.getElementById("velocidad");
+    const cuerpoTabla = document.getElementById("cuerpoTabla");
+    const mensajeError = document.getElementById("mensajeError");
+    const velPromedioEl = document.getElementById("velPromedio");
+    const velMinimaEl = document.getElementById("velMinima");
+    const velMaximaEl = document.getElementById("velMaxima");
+
+    function renderizarTablaYEstadisticas() {
+      // Obtiene los elementos ordenados de menor a mayor velocidad vía In-Orden
+      const vehiculosOrdenados = arbol.recorridoInOrden();
+
+      // Limpia el cuerpo de la tabla antes de volver a pintarlo
+      cuerpoTabla.innerHTML = "";
+
+      if (vehiculosOrdenados.length === 0) {
+        cuerpoTabla.innerHTML = `
+          <tr>
+            <td colspan="2" style="text-align: center;">No hay vehículos cargados</td>
+          </tr>
+        `;
+        velPromedioEl.textContent = "Velocidad promedio: 0";
+        velMinimaEl.textContent = "Velocidad mínima: 0";
+        velMaximaEl.textContent = "Velocidad máxima: 0";
+        return;
+      }
+
+      // Agrega cada vehículo ordenado como fila de la tabla
+      for (const item of vehiculosOrdenados) {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${escaparHTML(item.modelo)}</td>
+          <td>${item.velocidad}</td>
+        `;
+        cuerpoTabla.appendChild(fila);
+      }
+
+      // Calcula promedio, velocidad mínima y velocidad máxima
+      let suma = 0;
+      let minima = vehiculosOrdenados[0].velocidad;
+      let maxima = vehiculosOrdenados[0].velocidad;
+
+      for (const item of vehiculosOrdenados) {
+        suma += item.velocidad;
+        if (item.velocidad < minima) minima = item.velocidad;
+        if (item.velocidad > maxima) maxima = item.velocidad;
+      }
+
+      const promedio = suma / vehiculosOrdenados.length;
+      // Redondea a 2 decimales solo si tiene decimales
+      const promedioFormateado = Number.isInteger(promedio)
+        ? promedio
+        : Number(promedio.toFixed(2));
+
+      velPromedioEl.textContent = `Velocidad promedio: ${promedioFormateado}`;
+      velMinimaEl.textContent = `Velocidad mínima: ${minima}`;
+      velMaximaEl.textContent = `Velocidad máxima: ${maxima}`;
+    }
+
+    // Evita inyección de etiquetas HTML si el usuario escribe símbolos en el modelo
+    function escaparHTML(texto) {
+      return texto
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    /* =====================================================================
+       4. EVENTO DE CARGA DEL FORMULARIO
+       Valida los datos ingresados, los guarda en el árbol binario y refresca
+       la tabla y las estadísticas de forma inmediata.
+       ===================================================================== */
+    formVehiculo.addEventListener("submit", function (evento) {
+      evento.preventDefault();
+      mensajeError.textContent = "";
+
+      const modelo = inputModelo.value.trim();
+      const velocidad = Number(inputVelocidad.value);
+
+      if (!modelo) {
+        mensajeError.textContent = "Ingresá un modelo válido.";
+        return;
+      }
+
+      if (Number.isNaN(velocidad) || velocidad <= 0) {
+        mensajeError.textContent = "Ingresá una velocidad máxima mayor a 0.";
+        return;
+      }
+
+      // Inserta en el árbol binario y actualiza la vista al instante
+      arbol.insertar(modelo, velocidad);
+      renderizarTablaYEstadisticas();
+
+      // Limpia los campos y devuelve el foco al modelo
+      inputModelo.value = "";
+      inputVelocidad.value = "";
+      inputModelo.focus();
+    });
+
+    /* =====================================================================
+       5. DATOS INICIALES DE EJEMPLO (SEGÚN LA CAPTURA DEL PARCIAL)
+       Carga los 5 vehículos de la imagen para mostrar el estado inicial:
+       Clio (155), Idea (170), Siena (180), Fiesta (200), Civic (210).
+       Si querés empezar con la tabla vacía, borrá estas 5 líneas.
+       ===================================================================== */
+    arbol.insertar("Clio", 155);
+    arbol.insertar("Idea", 170);
+    arbol.insertar("Siena", 180);
+    arbol.insertar("Fiesta", 200);
+    arbol.insertar("Civic", 210);
+    renderizarTablaYEstadisticas();
+  </script>
+</body>
+</html>

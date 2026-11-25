@@ -1,0 +1,25 @@
+Recibe un arreglo ordenado de enteros, el valor buscado y los límites inicio y fin,
+ devolviendo si existe, su posición y cuántas llamadas recursivas tomó.
+
+function busquedaBinariaRecursiva(arr, objetivo, inicio = 0, fin = arr.length - 1, llamadas = 0) {
+  // Caso base de fallo: se cruzan los límites sin hallar el valor
+  if (inicio > fin) {
+    return { encontrado: false, indice: -1, llamadas };
+  }
+
+  llamadas++;
+  const medio = Math.floor((inicio + fin) / 2);
+
+  // Caso base de éxito: el elemento central coincide con el objetivo
+  if (arr[medio] === objetivo) {
+    return { encontrado: true, indice: medio, llamadas };
+  }
+
+  // Descarta la mitad derecha si el objetivo es menor
+  if (objetivo < arr[medio]) {
+    return busquedaBinariaRecursiva(arr, objetivo, inicio, medio - 1, llamadas);
+  }
+
+  // Descarta la mitad izquierda si el objetivo es mayor
+  return busquedaBinariaRecursiva(arr, objetivo, medio + 1, fin, llamadas);
+}
